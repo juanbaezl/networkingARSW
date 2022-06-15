@@ -30,7 +30,7 @@ mvn package
 Para ejecutarlo, se debe hacer de la siguiente forma
 
 ```
-$ java -cp "target\classes" edu.escuelaing.co.app.HttpServerController [Start o Stop]
+$ java -cp "target\classes" edu.escuelaing.co.app.HttpServerController [start o stop]
 ```
 
 Una vez ejecute este comando podrá ingresar al servidor web desde su navegador con la siguiente ruta http://localhost:35000/resources/index.html, en esta encontrará una página html con un script en JavaScript y 2 imagenes, una jpeg y otra gif.
