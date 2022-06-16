@@ -33,7 +33,7 @@ public class RequestProcessor implements Runnable {
             clientSocket.close();
             System.out.println(Thread.currentThread());
         } catch (Exception e) {
-            System.out.println("No se pudo crear el hilo");
+            System.out.println("No se pudo crear el hilo " + e);
         }
     }
 

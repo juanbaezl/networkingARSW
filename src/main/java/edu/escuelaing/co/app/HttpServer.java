@@ -93,7 +93,7 @@ public class HttpServer {
      * @throws IOException
      */
     public static void response(String path, Socket clientSocket) throws IOException {
-        String outputLine, extension = path.substring(path.indexOf(".") + 1);
+        String outputLine, encabezado = "HTTP/1.1 200 OK\r\n", extension = path.substring(path.indexOf(".") + 1);
         PrintWriter out;
         File archivo = new File(path);
         if (archivo.exists()) {
@@ -102,30 +102,34 @@ public class HttpServer {
                 DataOutputStream binaryOut;
                 binaryOut = new DataOutputStream(clientSocket.getOutputStream());
                 byte[] imagen = lectorImagen(archivo);
-                outputLine = "HTTP/1.1 200 OK\r\n"
+                outputLine = encabezado
                         + "Content-Type: image/" + extension + "\r\n"
                         + "Content-Length: " + imagen.length + "\r\n"
                         + "\r\n";
                 binaryOut.writeBytes(outputLine);
+                System.out.println("Respuesta: " + encabezado);
                 binaryOut.write(imagen);
                 binaryOut.close();
                 binaryOut.close();
             } else if (extension.equals("html") || extension.equals("js")) {
                 out = new PrintWriter(clientSocket.getOutputStream(), true);
-                outputLine = "HTTP/1.1 200 OK\r\n"
+                outputLine = encabezado
                         + "Content-Type: text/" + extension + "\r\n"
                         + "\r\n"
                         + lectorArchivo(archivo);
                 out.println(outputLine);
+                System.out.println("Respuesta: " + encabezado);
                 out.close();
             } else {
                 out = new PrintWriter(clientSocket.getOutputStream(), true);
                 out.println(ERROR501);
+                System.out.println("Respuesta: " + "HTTP/1.1 501 Not Implemented");
                 out.close();
             }
         } else {
             out = new PrintWriter(clientSocket.getOutputStream(), true);
             out.println(ERROR404);
+            System.out.println("Respuesta: " + "HTTP/1.1 404 Not Found");
             out.close();
         }
     }
