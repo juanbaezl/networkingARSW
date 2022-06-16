@@ -6,6 +6,8 @@ Networking
 
 En este repositorio se encontrara un programa que crea un servidor web, permitiendo multiples solicitudes seguidas concurrentes.
 
+Para ver la implementación en Heroku dirijase [aquí](https://servidorweb-arsw.herokuapp.com/resources/index.html)
+
 ### LOC/h
 
 Para este taller se hicieron 479 líneas de código, en 9 horas.
