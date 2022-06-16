@@ -135,26 +135,22 @@ public class HttpServer {
      * 
      * @param in BufferedReader de la peticion
      * @return Path al cual quiere acceder el cliente
+     * @throws IOException
      */
-    public static String lecturaRequest(BufferedReader in) {
+    public static String lecturaRequest(BufferedReader in) throws IOException {
         String inputLine = "", path = "";
-        try {
-            boolean firstLine = true;
-            while ((inputLine = in.readLine()) != null) {
-                if (firstLine && inputLine.startsWith("GET")) {
-                    path = inputLine.split(" ")[1].substring(1);
-                    System.out.println("Path: " + path);
-                    firstLine = false;
-                }
-                System.out.println("Received: " + inputLine);
-                if (inputLine.equals("exit"))
-                    bandera = false;
-                if (!in.ready())
-                    break;
-
+        boolean firstLine = true;
+        while ((inputLine = in.readLine()) != null) {
+            if (firstLine && inputLine.startsWith("GET")) {
+                path = inputLine.split(" ")[1].substring(1);
+                System.out.println("Path: " + path);
+                firstLine = false;
             }
-        } catch (Exception e) {
-            System.out.println("Error al leer peticion " + e);
+            System.out.println("Received: " + inputLine);
+            if (inputLine.equals("exit"))
+                bandera = false;
+            if (!in.ready())
+                break;
         }
         return path;
     }
