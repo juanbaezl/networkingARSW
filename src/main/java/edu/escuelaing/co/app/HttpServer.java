@@ -2,6 +2,8 @@ package edu.escuelaing.co.app;
 
 import java.net.*;
 import java.util.Scanner;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.io.*;
 
 /**
@@ -13,12 +15,12 @@ public class HttpServer {
     private static HttpServer _instance = new HttpServer();
 
     // Bandera de salida
-    private boolean bandera = true;
+    private static boolean bandera = true;
 
     // Errores
-    private String ERROR404 = "HTTP/1.1 404 Not Found \r\n\r\n" + "<!DOCTYPE html>" + "<html>"
+    private static String ERROR404 = "HTTP/1.1 404 Not Found \r\n\r\n" + "<!DOCTYPE html>" + "<html>"
             + "<h1>No se pudo encontrar el recurso</h1>" + "</html>";
-    private String ERROR501 = "HTTP/1.1 501 Not Implemented\r\n\r\n" + "<!DOCTYPE html>" + "<html>"
+    private static String ERROR501 = "HTTP/1.1 501 Not Implemented\r\n\r\n" + "<!DOCTYPE html>" + "<html>"
             + "<h1>No se ha implementado</h1>" + "</html>";
 
     /**
@@ -38,22 +40,12 @@ public class HttpServer {
      * @throws IOException
      */
     public void start() throws IOException {
+        ExecutorService poolDeHilos = Executors.newFixedThreadPool(10);
         ServerSocket serverSocket = startServer();
         while (bandera) {
             Socket clientSocket = startSocket(serverSocket);
-            BufferedReader in = new BufferedReader(
-                    new InputStreamReader(clientSocket.getInputStream()));
-            String path = lecturaRequest(in);
-            if (bandera) {
-                response(path, clientSocket);
-            } else {
-                PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-                System.out.println("Se ha apagado el servidor");
-                out.println("El servidor web se ha apagado");
-                out.close();
-            }
-            in.close();
-            clientSocket.close();
+            RequestProcessor processor = new RequestProcessor(clientSocket, bandera);
+            poolDeHilos.execute(processor);
         }
         serverSocket.close();
     }
@@ -100,7 +92,7 @@ public class HttpServer {
      * @param clientSocket Conexion con el cliente
      * @throws IOException
      */
-    private void response(String path, Socket clientSocket) throws IOException {
+    public static void response(String path, Socket clientSocket) throws IOException {
         String outputLine, extension = path.substring(path.indexOf(".") + 1);
         PrintWriter out;
         File archivo = new File(path);
@@ -144,7 +136,7 @@ public class HttpServer {
      * @param in BufferedReader de la peticion
      * @return Path al cual quiere acceder el cliente
      */
-    private String lecturaRequest(BufferedReader in) {
+    public static String lecturaRequest(BufferedReader in) {
         String inputLine = "", path = "";
         try {
             boolean firstLine = true;
@@ -174,7 +166,7 @@ public class HttpServer {
      * @return String del contenido del archivo
      * @throws FileNotFoundException
      */
-    private String lectorArchivo(File archivo) throws FileNotFoundException {
+    private static String lectorArchivo(File archivo) throws FileNotFoundException {
         String file = "";
         Scanner obj;
         obj = new Scanner(archivo);
@@ -192,7 +184,7 @@ public class HttpServer {
      * @return Array de bytes de la imagen
      * @throws IOException
      */
-    private byte[] lectorImagen(File archivo) throws IOException {
+    private static byte[] lectorImagen(File archivo) throws IOException {
         byte[] imagen = new byte[0];
         FileInputStream inputImage = new FileInputStream(archivo);
         byte[] bytes = new byte[(int) archivo.length()];
